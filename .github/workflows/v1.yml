@@ -27,10 +27,11 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          mkdir -p app/src/main/java/com/ctrl/life app/src/main/res/values
+          mkdir -p app/src/main/java/com/ctrl/life app/src/main/res/values app/src/main/res/drawable
           cp build.gradle.kts app/build.gradle.kts
           cp v1_manifest.xml app/src/main/AndroidManifest.xml
           cp themes.xml app/src/main/res/values/themes.xml
+          cp res/drawable/ctrl_icon.xml app/src/main/res/drawable/ctrl_icon.xml
           for f in *.kt; do
             case "$f" in
               MainActivity.kt|Test.kt) ;;
