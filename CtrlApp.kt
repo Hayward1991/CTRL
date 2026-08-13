@@ -29,7 +29,7 @@ import java.time.LocalDate
  Scaffold(containerColor=CtrlBg,bottomBar={CtrlBottom(tab){tab=it}},floatingActionButton={if(tab==Tab.TODAY)FloatingActionButton({capture=true}){Text("+")}}){pad->
   when(tab){
    Tab.TODAY->TodayScreenV1(tasks,calendar,over,message,pad,onTasks={save(it)},store=store)
-   Tab.PLAN->PlanScreenV1(tasks,calendar,pad)
+   Tab.PLAN->PlanScreenV1(tasks,pad)
    Tab.LIFE->LifeScreenV1(tasks,pad)
   }
  }
