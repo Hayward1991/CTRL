@@ -25,7 +25,7 @@ import java.time.LocalDate
   item{Text("NOW",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
   if(active!=null)item{ActiveTaskV1(active,tasks,onTasks,store)} else item{Surface(color=CtrlCard,shape=RoundedCornerShape(24.dp),border=BorderStroke(1.dp,CtrlLine)){Text("Nothing needs you right now.",Modifier.fillMaxWidth().padding(30.dp),textAlign=TextAlign.Center)}}
   if(cal.isNotEmpty())item{Text("CALENDAR",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
-  items(cal,key={"cal-${it.id}-${it.startMillis}"}){c->Surface(color=CtrlSoft,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,CtrlGold.copy(alpha=.45f))){Column(Modifier.fillMaxWidth().padding(14.dp)){Text(c.title,fontWeight=FontWeight.SemiBold,color=CtrlInk);Text(c.sourceLabel(),fontSize=12.sp,color=CtrlMuted)}}}
+  items(cal,key={"cal-${it.id}-${it.startMillis}"}){CalendarLineV1(it)}
   item{Text("TODAY",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
   items(list,key={it.id}){TaskLineV1(it)}
  }
