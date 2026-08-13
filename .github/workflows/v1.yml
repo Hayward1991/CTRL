@@ -34,7 +34,7 @@ jobs:
           cp res/drawable/ctrl_icon.xml app/src/main/res/drawable/ctrl_icon.xml
           for f in *.kt; do
             case "$f" in
-              MainActivity.kt|Test.kt) ;;
+              MainActivity.kt|V1Main.kt|Test.kt) ;;
               *) cp "$f" app/src/main/java/com/ctrl/life/ ;;
             esac
           done
@@ -44,6 +44,19 @@ jobs:
               sed -i '/import androidx.compose.material3.*/a import androidx.compose.runtime.Composable' "$target"
             fi
           done
+          cat > app/src/main/java/com/ctrl/life/AppEntry.kt <<'EOF'
+          package com.ctrl.life
+          import android.os.Bundle
+          import androidx.activity.ComponentActivity
+          import androidx.activity.compose.setContent
+          class MainActivity : ComponentActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  CtrlNotifications.create(this)
+                  setContent { CtrlTheme { CtrlApp() } }
+              }
+          }
+          EOF
           cat > build.gradle.kts <<'EOF'
           plugins {
               id("com.android.application") version "9.3.1" apply false
