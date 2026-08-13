@@ -2,8 +2,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <application
         android:allowBackup="true"
+        android:icon="@drawable/ctrl_icon"
         android:label="CTRL"
         android:theme="@style/Theme.CTRL"
         android:usesCleartextTraffic="false">
@@ -15,6 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".VoiceServiceShell"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
         <receiver android:name=".CtrlAlarmReceiver" android:exported="false" />
         <receiver android:name=".BootRecoveryReceiver" android:enabled="true" android:exported="true">
             <intent-filter>
