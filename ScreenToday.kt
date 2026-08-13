@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 
-@Composable fun TodayScreenV1(tasks:List<CtrlTask>,over:Int,message:String,pad:PaddingValues,onTasks:(List<CtrlTask>)->Unit,store:CtrlStore){
+@Composable fun TodayScreenV1(tasks:List<CtrlTask>,calendar:List<CalendarBlock>,over:Int,message:String,pad:PaddingValues,onTasks:(List<CtrlTask>)->Unit,store:CtrlStore){
  val list=tasks.filter{it.date==LocalDate.now().toString()&&!it.isDone()}.sortedBy{it.start}
+ val cal=calendar.filter{it.startZdt().toLocalDate()==LocalDate.now()}.sortedBy{it.startMillis}
  val active=list.firstOrNull{it.status==Status.ACTIVE||it.status==Status.PAUSED}?:list.firstOrNull()
  LazyColumn(Modifier.fillMaxSize().padding(pad),contentPadding=PaddingValues(20.dp,24.dp,20.dp,110.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
   item{CtrlHeader()}
@@ -23,6 +24,8 @@ import java.time.LocalDate
   item{Surface(color=CtrlSoft,shape=RoundedCornerShape(16.dp)){Text(message,Modifier.fillMaxWidth().padding(14.dp),textAlign=TextAlign.Center,color=CtrlInk)}}
   item{Text("NOW",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
   if(active!=null)item{ActiveTaskV1(active,tasks,onTasks,store)} else item{Surface(color=CtrlCard,shape=RoundedCornerShape(24.dp),border=BorderStroke(1.dp,CtrlLine)){Text("Nothing needs you right now.",Modifier.fillMaxWidth().padding(30.dp),textAlign=TextAlign.Center)}}
+  if(cal.isNotEmpty())item{Text("CALENDAR",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
+  items(cal,key={"cal-${it.id}-${it.startMillis}"}){c->Surface(color=CtrlSoft,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,CtrlGold.copy(alpha=.45f))){Column(Modifier.fillMaxWidth().padding(14.dp)){Text(c.title,fontWeight=FontWeight.SemiBold,color=CtrlInk);Text(c.sourceLabel(),fontSize=12.sp,color=CtrlMuted)}}}
   item{Text("TODAY",fontSize=12.sp,letterSpacing=2.sp,color=CtrlMuted,fontWeight=FontWeight.Bold)}
   items(list,key={it.id}){TaskLineV1(it)}
  }
