@@ -28,7 +28,7 @@ import kotlin.math.max
    Text("${CtrlRules.scoreArea(t.area).name.replace('_',' ')} · ${t.priority.name}",fontSize=12.sp,color=CtrlMuted)
    Spacer(Modifier.height(8.dp));Text(t.title,fontSize=27.sp,fontWeight=FontWeight.Bold,textAlign=TextAlign.Center,color=CtrlInk)
    Spacer(Modifier.height(8.dp));Text("${t.start} · ${t.minutes} min",fontSize=17.sp,color=CtrlMuted)
-   if(t.status==Status.ACTIVE||t.status==Status.PAUSED){Spacer(Modifier.height(10.dp));Text(clock,fontSize=34.sp,fontWeight=FontWeight.Black,color=CtrlInk)}
+   if(t.status==Status.ACTIVE||t.status==Status.PAUSED){Spacer(Modifier.height(10.dp));Text(clock,fontSize=34.sp,fontWeight=FontWeight.Black,color=if(isFinalCountdown(remaining))MaterialTheme.colorScheme.error else CtrlInk)}
    Spacer(Modifier.height(18.dp));TaskButtonsV1(t.status,onStart={replace(TaskRuntime.start(t))},onPause={replace(TaskRuntime.pause(t))},onPostpone={replace(TaskRuntime.postpone(t))},onFinish={replace(TaskRuntime.finish(t,store))})
   }
  }
