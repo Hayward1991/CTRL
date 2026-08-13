@@ -13,6 +13,6 @@ class MainActivity:ComponentActivity(){
   if(checkSelfPermission(Manifest.permission.READ_CALENDAR)!=PackageManager.PERMISSION_GRANTED){
    requestPermissions(arrayOf(Manifest.permission.READ_CALENDAR),7001)
   }
-  setContent{CtrlTheme{CtrlApp()}}
+  BiometricGate.unlock(this){setContent{CtrlTheme{CtrlApp()}}}
  }
 }
