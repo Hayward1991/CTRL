@@ -20,5 +20,6 @@ import androidx.compose.ui.unit.sp
   item{Surface(color=CtrlInk,shape=RoundedCornerShape(28.dp)){Column(Modifier.fillMaxWidth().padding(28.dp),horizontalAlignment=Alignment.CenterHorizontally){Text("OVERALL",color=CtrlCard.copy(alpha=.7f));Text("$overall",color=CtrlCard,fontSize=58.sp,fontWeight=FontWeight.Black);Text("this week",color=CtrlCard.copy(alpha=.7f))}}}
   items(listOf(Area.FAMILY,Area.SELF_CARE,Area.HEALTH,Area.HOME,Area.WORK,Area.PERSONAL)){a->Surface(color=CtrlCard,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,CtrlLine)){Row(Modifier.fillMaxWidth().padding(18.dp),verticalAlignment=Alignment.CenterVertically){Text(a.name.replace('_',' '),Modifier.weight(1f),fontWeight=FontWeight.Bold);Text("${scores[a]?:100}",fontSize=24.sp,fontWeight=FontWeight.Black)}}}
   item{Surface(color=CtrlCard,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,CtrlLine)){Column(Modifier.fillMaxWidth().padding(18.dp)){Text("HEY CONTROL",fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text("Voice capture runs only after you start it.",color=CtrlMuted);Spacer(Modifier.height(12.dp));VoiceControls()}}}
+  item{UpdateControls()}
  }
 }
