@@ -29,7 +29,7 @@ jobs:
           set -euxo pipefail
           mkdir -p app/src/main/java/com/ctrl/life app/src/main/res/values
           cp build.gradle.kts app/build.gradle.kts
-          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp v1_manifest.xml app/src/main/AndroidManifest.xml
           cp themes.xml app/src/main/res/values/themes.xml
           for f in *.kt; do
             case "$f" in
