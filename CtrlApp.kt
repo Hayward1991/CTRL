@@ -1,9 +1,33 @@
 package com.ctrl.life
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
 import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import java.time.LocalDate
 
-@Composable fun CtrlApp(){ }
+@Composable fun CtrlApp(){
+ val context=LocalContext.current
+ val store=remember{CtrlStore(context)}
+ var tasks by remember{mutableStateOf(store.loadTasks().toList())}
+ var tab by remember{mutableStateOf(Tab.TODAY)}
+ var capture by remember{mutableStateOf(false)}
+ var message by remember{mutableStateOf("CTRL has your day.")}
+ var over by remember{mutableIntStateOf(0)}
+ fun save(next:List<CtrlTask>){
+  val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),emptyList(),LocalDate.now())
+  tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks)
+ }
+ LaunchedEffect(Unit){save(RoutineFactory.ensureToday(tasks,store,LocalDate.now().dayOfWeek.value in 1..5))}
+ Scaffold(containerColor=CtrlBg,bottomBar={CtrlBottom(tab){tab=it}},floatingActionButton={if(tab==Tab.TODAY)FloatingActionButton({capture=true}){Text("+")}}){pad->
+  when(tab){
+   Tab.TODAY->TodayScreenV1(tasks,over,message,pad,onTasks={save(it)},store=store)
+   Tab.PLAN->PlanScreenV1(tasks,pad)
+   Tab.LIFE->LifeScreenV1(tasks,pad)
+  }
+ }
+ if(capture)CaptureV1(onDismiss={capture=false}){raw->
+  val p=CaptureParser.parse(raw)
+  val t=CtrlTask(title=p.title,area=p.area,priority=p.priority,date=p.date.toString(),start=(p.time?:java.time.LocalTime.now().plusMinutes(5)).toString().take(5),cleaning=p.cleaning,snitchEligible=p.cleaning,hardDeadline=p.hard,source="manual")
+  save(tasks+t);message="Added. CTRL found the next available slot.";capture=false
+ }
+}
