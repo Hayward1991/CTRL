@@ -8,6 +8,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.core.app.NotificationCompat
+import java.time.LocalTime
 
 class VoiceServiceShell:Service(),RecognitionListener{
  private var recognizer:SpeechRecognizer?=null
@@ -32,7 +33,19 @@ class VoiceServiceShell:Service(),RecognitionListener{
    putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS,true)
   })
  }
- override fun onResults(results:Bundle?){listen()}
+ private fun handle(text:String){
+  val marker="hey control"
+  val lower=text.lowercase()
+  val pos=lower.indexOf(marker)
+  if(pos<0)return
+  val command=text.substring(pos+marker.length).trim(' ', ',', '.')
+  if(command.isBlank())return
+  val p=CaptureParser.parse(command)
+  val task=CtrlTask(title=p.title,area=p.area,priority=p.priority,date=p.date.toString(),start=(p.time?:LocalTime.now().plusMinutes(5)).toString().take(5),cleaning=p.cleaning,snitchEligible=p.cleaning,hardDeadline=p.hard,source="voice")
+  val store=CtrlStore(this);val tasks=store.loadTasks()+task;store.saveTasks(tasks);AlarmScheduler.scheduleAll(this,tasks)
+  CtrlNotifications.task(this,"Added: ${task.title}")
+ }
+ override fun onResults(results:Bundle?){results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(::handle);listen()}
  override fun onError(error:Int){listen()}
  override fun onReadyForSpeech(params:Bundle?){}
  override fun onBeginningOfSpeech(){}
