@@ -16,7 +16,8 @@ import java.time.LocalDate
  var message by remember{mutableStateOf("CTRL has your day.")}
  var over by remember{mutableIntStateOf(0)}
  fun save(next:List<CtrlTask>){
-  val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),CalendarBridge.read(context),LocalDate.now())
+  val prepared=RoutineLocks.apply(RoutineFactory.unlockDependencies(next))
+  val planned=Planner.planDay(prepared,CalendarBridge.read(context),LocalDate.now())
   tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks);AlarmScheduler.scheduleAll(context,tasks)
  }
  LaunchedEffect(Unit){
