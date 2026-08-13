@@ -3,11 +3,19 @@ package com.ctrl.life
 import kotlin.math.max
 
 object TaskRuntime {
- fun start(t:CtrlTask,now:Long=System.currentTimeMillis())=t.copy(status=Status.ACTIVE,startedAt=t.startedAt?:now,pausedAt=null)
- fun pause(t:CtrlTask,now:Long=System.currentTimeMillis())=t.copy(status=Status.PAUSED,pausedAt=now)
+ fun start(t:CtrlTask,now:Long=System.currentTimeMillis())=t.copy(status=Status.ACTIVE,startedAt=now,pausedAt=null)
+ fun pause(t:CtrlTask,now:Long=System.currentTimeMillis()):CtrlTask{
+  val activeSeconds=if(t.startedAt==null)0L else max(0L,(now-t.startedAt)/1000L)
+  return t.copy(status=Status.PAUSED,startedAt=null,pausedAt=now,accumulatedSeconds=t.accumulatedSeconds+activeSeconds)
+ }
+ fun elapsedSeconds(t:CtrlTask,now:Long=System.currentTimeMillis()):Long{
+  val activeSeconds=if(t.status==Status.ACTIVE&&t.startedAt!=null)max(0L,(now-t.startedAt)/1000L) else 0L
+  return t.accumulatedSeconds+activeSeconds
+ }
  fun finish(t:CtrlTask,store:CtrlStore,now:Long=System.currentTimeMillis()):CtrlTask{
-  val elapsed=max(1,((now-(t.startedAt?:now))/60000L).toInt())
+  val totalSeconds=elapsedSeconds(t,now)
+  val elapsed=max(1,((totalSeconds+59L)/60L).toInt())
   store.recordDuration(t.recurrenceKey?:t.title,elapsed,t.minutes)
-  return t.copy(status=Status.COMPLETED,completedAt=now,actualMinutes=elapsed)
+  return t.copy(status=Status.COMPLETED,startedAt=null,pausedAt=null,accumulatedSeconds=totalSeconds,completedAt=now,actualMinutes=elapsed)
  }
 }
