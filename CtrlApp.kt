@@ -17,7 +17,7 @@ import java.time.LocalDate
  var over by remember{mutableIntStateOf(0)}
  fun save(next:List<CtrlTask>){
   val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),CalendarBridge.read(context),LocalDate.now())
-  tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks)
+  tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks);AlarmScheduler.scheduleAll(context,tasks)
  }
  LaunchedEffect(Unit){
   save(RoutineFactory.ensureToday(tasks,store,LocalDate.now().dayOfWeek.value in 1..5))
