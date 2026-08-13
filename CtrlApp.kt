@@ -11,13 +11,14 @@ import java.time.LocalDate
  val context=LocalContext.current
  val store=remember{CtrlStore(context)}
  var tasks by remember{mutableStateOf(store.loadTasks().toList())}
+ var calendar by remember{mutableStateOf(CalendarBridge.read(context))}
  var tab by remember{mutableStateOf(Tab.TODAY)}
  var capture by remember{mutableStateOf(false)}
  var message by remember{mutableStateOf("CTRL has your day.")}
  var over by remember{mutableIntStateOf(0)}
  fun save(next:List<CtrlTask>){
-  val prepared=RoutineLocks.apply(RoutineFactory.unlockDependencies(next))
-  val planned=Planner.planDay(prepared,CalendarBridge.read(context),LocalDate.now())
+  calendar=CalendarBridge.read(context)
+  val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),calendar,LocalDate.now())
   tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks);AlarmScheduler.scheduleAll(context,tasks)
  }
  LaunchedEffect(Unit){
@@ -27,8 +28,8 @@ import java.time.LocalDate
  }
  Scaffold(containerColor=CtrlBg,bottomBar={CtrlBottom(tab){tab=it}},floatingActionButton={if(tab==Tab.TODAY)FloatingActionButton({capture=true}){Text("+")}}){pad->
   when(tab){
-   Tab.TODAY->TodayScreenV1(tasks,over,message,pad,onTasks={save(it)},store=store)
-   Tab.PLAN->PlanScreenV1(tasks,pad)
+   Tab.TODAY->TodayScreenV1(tasks,calendar,over,message,pad,onTasks={save(it)},store=store)
+   Tab.PLAN->PlanScreenV1(tasks,calendar,pad)
    Tab.LIFE->LifeScreenV1(tasks,pad)
   }
  }
