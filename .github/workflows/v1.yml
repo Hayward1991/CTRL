@@ -44,18 +44,6 @@ jobs:
               sed -i '/import androidx.compose.material3.*/a import androidx.compose.runtime.Composable' "$target"
             fi
           done
-          cat > app/src/main/java/com/ctrl/life/AppEntry.kt <<'EOF'
-          package com.ctrl.life
-          import android.os.Bundle
-          import androidx.activity.ComponentActivity
-          import androidx.activity.compose.setContent
-          class MainActivity : ComponentActivity() {
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContent { CtrlTheme { CtrlApp() } }
-              }
-          }
-          EOF
           cat > build.gradle.kts <<'EOF'
           plugins {
               id("com.android.application") version "9.3.1" apply false
