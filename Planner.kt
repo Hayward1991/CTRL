@@ -11,15 +11,19 @@ object Planner{
   b.sortBy{it.first};return b
  }
  fun planDay(tasks:List<CtrlTask>,calendar:List<CalendarBlock>,date:LocalDate=LocalDate.now()):PlanResult{
-  val b=blocked(tasks,calendar,date);val out=tasks.toMutableList();var cursor=date.atTime(6,0);val dayEnd=date.atTime(22,30);var over=0
+  val b=blocked(tasks,calendar,date);val out=tasks.toMutableList();var cursor=date.atTime(6,0);val bedtime=date.atTime(22,30);var over=0
   fun hit(s:LocalDateTime,e:LocalDateTime)=b.firstOrNull{s<it.second&&e>it.first}
   fun slot(from:LocalDateTime,min:Int,latest:LocalDateTime):LocalDateTime?{var s=from;while(s.plusMinutes(min.toLong())<=latest){val h=hit(s,s.plusMinutes(min.toLong()));if(h==null)return s;s=h.second.plusMinutes(CtrlRules.BUFFER_MIN.toLong())};return null}
   val movable=tasks.filter{it.date==date.toString()&&!it.isDone()&&!isProtected(it)}.sortedWith(compareByDescending<CtrlTask>{PriorityOrder.rank(it)}.thenBy{it.deadline?:"9999"})
   movable.forEach{t->
    val desired=maxOf(cursor,t.localStart())
-   val latest=if(t.area==Area.WORK) date.atTime(17,30) else dayEnd
+   val latest=if(t.area==Area.WORK) date.atTime(17,30) else bedtime
    val s=slot(desired,t.minutes,latest)
-   if(s==null){if(t.priority!=Priority.SOMEDAY)over+=t.minutes}else{
+   if(s==null){
+    val i=out.indexOfFirst{it.id==t.id}
+    if(i>=0&&t.status==Status.DELAYED)out[i]=t.copy(date=date.plusDays(1).toString(),start="06:00",status=Status.QUEUED)
+    else if(t.priority!=Priority.SOMEDAY)over+=t.minutes
+   }else{
     val i=out.indexOfFirst{it.id==t.id};if(i>=0)out[i]=t.copy(start=s.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),status=if(t.status==Status.QUEUED||t.status==Status.DELAYED)Status.SCHEDULED else t.status)
     cursor=s.plusMinutes(t.minutes.toLong()+CtrlRules.BUFFER_MIN)
    }
