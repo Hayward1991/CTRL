@@ -1,0 +1,55 @@
+name: Build CTRL v1
+
+on:
+  push:
+    branches: [ ctrl-v1-final ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 9.5
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.5.0'
+
+      - name: Reconstruct v1 Android project
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p app/src/main/java/com/ctrl/life app/src/main/res/values
+          cp build.gradle.kts app/build.gradle.kts
+          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp themes.xml app/src/main/res/values/themes.xml
+          for f in *.kt; do
+            case "$f" in
+              MainActivity.kt|Test.kt) ;;
+              *) cp "$f" app/src/main/java/com/ctrl/life/ ;;
+            esac
+          done
+          cat > build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application") version "9.3.1" apply false
+              id("org.jetbrains.kotlin.plugin.compose") version "2.3.21" apply false
+          }
+          EOF
+
+      - name: Build debug APK
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Upload CTRL v1 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CTRL-v1-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
