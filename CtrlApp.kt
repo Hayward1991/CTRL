@@ -3,6 +3,8 @@ package com.ctrl.life
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 @Composable fun CtrlApp(){
@@ -14,10 +16,14 @@ import java.time.LocalDate
  var message by remember{mutableStateOf("CTRL has your day.")}
  var over by remember{mutableIntStateOf(0)}
  fun save(next:List<CtrlTask>){
-  val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),emptyList(),LocalDate.now())
+  val planned=Planner.planDay(RoutineFactory.unlockDependencies(next),CalendarBridge.read(context),LocalDate.now())
   tasks=planned.tasks;over=planned.overCapacityMinutes;store.saveTasks(tasks)
  }
- LaunchedEffect(Unit){save(RoutineFactory.ensureToday(tasks,store,LocalDate.now().dayOfWeek.value in 1..5))}
+ LaunchedEffect(Unit){
+  save(RoutineFactory.ensureToday(tasks,store,LocalDate.now().dayOfWeek.value in 1..5))
+  val synced=withContext(Dispatchers.IO){runCatching{CloudSync.reconcile(context,tasks)}.getOrDefault(tasks)}
+  save(synced)
+ }
  Scaffold(containerColor=CtrlBg,bottomBar={CtrlBottom(tab){tab=it}},floatingActionButton={if(tab==Tab.TODAY)FloatingActionButton({capture=true}){Text("+")}}){pad->
   when(tab){
    Tab.TODAY->TodayScreenV1(tasks,over,message,pad,onTasks={save(it)},store=store)
