@@ -37,6 +37,12 @@ jobs:
               *) cp "$f" app/src/main/java/com/ctrl/life/ ;;
             esac
           done
+          for f in LifeDashboard.kt TaskControls.kt; do
+            target="app/src/main/java/com/ctrl/life/$f"
+            if [ -f "$target" ] && ! grep -q 'runtime.Composable' "$target"; then
+              sed -i '/import androidx.compose.material3.*/a import androidx.compose.runtime.Composable' "$target"
+            fi
+          done
           cat > build.gradle.kts <<'EOF'
           plugins {
               id("com.android.application") version "9.3.1" apply false
