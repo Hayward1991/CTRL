@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
    Text("${CtrlRules.scoreArea(t.area).name.replace('_',' ')} · ${t.priority.name}",fontSize=12.sp,color=CtrlMuted)
    Spacer(Modifier.height(8.dp));Text(t.title,fontSize=27.sp,fontWeight=FontWeight.Bold,textAlign=TextAlign.Center,color=CtrlInk)
    Spacer(Modifier.height(8.dp));Text("${t.start} · ${t.minutes} min",fontSize=17.sp,color=CtrlMuted)
-   Spacer(Modifier.height(18.dp));TaskButtonsV1(t.status,onStart={replace(t.copy(status=Status.ACTIVE))},onPause={replace(t.copy(status=Status.PAUSED))},onFinish={replace(t.copy(status=Status.COMPLETED,completedAt=System.currentTimeMillis()))})
+   Spacer(Modifier.height(18.dp));TaskButtonsV1(t.status,onStart={replace(TaskRuntime.start(t))},onPause={replace(TaskRuntime.pause(t))},onFinish={replace(TaskRuntime.finish(t,store))})
   }
  }
 }
